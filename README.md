@@ -1,57 +1,73 @@
-# doom-nano
-A 3d raycast engine for Arduino
+# 🕹️ Doom no Arduino Uno
 
-![](/images/screen-1.jpg?raw=true)
+Este projeto traz um motor gráfico de *raycasting* em 3D, fortemente inspirado nos clássicos **Doom** e **Wolfenstein 3D**, otimizado para rodar nas extremas limitações de hardware de um **Arduino Uno** (ATmega328P).
 
-See it in action:
-- https://youtu.be/wJG04DSo7Xw (Progress on Feb, 09 2019)
-- https://youtu.be/FX7PQtUAkHk (Progress on Jan, 18 2019)
+Devido à restrição de memória (apenas 2 KB de RAM e 32 KB de Flash) e processamento (16 MHz), o jogo utiliza matemática de baixa precisão para renderizar um ambiente 3D em um display OLED monocromático, incluindo cenários, inimigos, movimentação e efeitos sonoros básicos.
 
-Just experimenting with an Arduino Nano I bought some time ago. This chip is very limited in process and memory: 16Mhz, only 32kb for program memory and 2kb of RAM, of which 1kb is entirely used for the screen.
-Most of problems I´m facing currently are about memory. CPU clock might be a problem too, but can be more or less avoided having more memory for calculation shortcuts.
-Despite of all those limitations it´s capable to run at up to 14 FPS. Probably can be optimized and structured much better. Will try to keep learning and improve it.
+---
 
-To be clear. **This is not an actual Doom game**, just picked some sprites from it (and simplified a lot). The rendering engine is more like a Wolfeistein 3D. The Doom idea came because I started this building the fancy melt-screen effect (included in an early version, but not anymore).
+## 🛠️ Componentes Necessários
 
-Hardware I used:
-- A protoboard
-- An Arduino Uno/Nano (ATmega328P)
-- An OLED Display (i2c 128x64)
-- 4 buttons
-- ~~4 10k ohms resistors~~. Not needed anymore, check out the wiring diagram from below.
-- Buzzer (Optional)
+Para montar o circuito físico, você precisará dos seguintes itens:
 
-Resources:
-- Sprites from https://www.spriters-resource.com
-- Much thanks to https://lodev.org/cgtutor for so wonderful resource about raycasting engines
+* **1x** Placa Arduino Uno (ou Nano)
+* **1x** Display OLED 0.96" I2C (128x64 pixels - 4 pinos)
+* **4x** Botões de Pressão (*Push Buttons*)
+* **1x** Buzzer Passivo (Para os efeitos sonoros)
+* **1x** Protoboard (Matriz de contatos)
+* **Vários** Fios Jumpers (Macho-Macho)
 
-Current status:
-- The map rendering is working nicely. Even I was able to add a depth effect by using different dithering patterns, depending on the distance to the view.
-- Sprites are working too, though has some issues hiding them behind walls because memory limitations (the z-buffer precision has been limited a lot to make it smaller).
-- You can move through the map, collide with walls, collect items and interact with enemies. I could also add the jogging effect, like Doom´s one.
-- The enemies AI, despite is very simple, I think works very well and it´s enough for the purpose of the game. Looks very similar to  Imp enemy from original Doom.
-- For the HUD, I realized that the native `print` from Adafruit's library uses too much memory. So I've implemented my custom text rendering methods and a custom font which includes only needed characters and some icons.
-- ~~Currently I´m using 99% of program memory, which doesn´t let me adds more code. I need to research how to optimize it to make it smaller.~~
-- FPS and memory consumption has been improved using a slim and customized version of the SSD1306 lib from Adafruit. Thanks  [@miracoly](https://github.com/miracoli)
-- Now it has a basic sound support through Pin 9. Thanks again [@miracoly](https://github.com/miracoli)!
+> **Nota:** Não é necessário o uso de resistores externos para os botões. O código utiliza os resistores internos do Arduino via `INPUT_PULLUP`.
 
-(I'd like) To do:
-- ~~Make possible kill enemies.~~
-- Doors and locked doors.
-- A game over screen.
-- Add more sprites, decorative elements, etc.
-- Textures? Very performance expensive. I don't think so.
-- Make code looks nicer! Move all to pure c++.
-- ~~Sound/Music? Hmmm I wish so, but...~~
+---
 
-Simplified version (using an Arduino UNO, built-in pull-up resistors for buttons and a buzzer):
-![](/images/input-pull-up-version.jpg?raw=true)
+## 🔌 Esquema de Ligação (Montagem)
 
-Wiring:
-![](/images/wiring.png?raw=true)
+Certifique-se de realizar as conexões com o Arduino desconectado do cabo USB/Energia.
 
-More screens (outdated):
-![](/images/screen-4.jpg?raw=true)
-![](/images/screen-5.jpg?raw=true)
-![](/images/screen-6.jpg?raw=true)
-![](/images/screen-7.jpg?raw=true)
+### 📺 1. Display OLED (I2C)
+O display exige os pinos analógicos I2C dedicados do Arduino Uno.
+
+| Pino do Display | Pino do Arduino | Descrição |
+| :--- | :--- | :--- |
+| **GND** | GND | Aterramento |
+| **VCC** | 5V | Alimentação |
+| **SCL** | A5 | Clock do I2C |
+| **SDA** | A4 | Dados do I2C |
+
+### 🔊 2. Áudio (Buzzer)
+O áudio é gerado nativamente e depende do Timer1.
+
+| Pino do Buzzer | Pino do Arduino / Protoboard |
+| :--- | :--- |
+| **Positivo (+)** | D9 |
+| **Negativo (-)** | Trilha GND da Protoboard |
+
+### 🎮 3. Controles (Botões)
+Conecte **um dos terminais** de todos os botões à trilha **GND** da protoboard. O terminal oposto de cada botão vai para os respectivos pinos digitais do Arduino:
+
+| Botão (Ação) | Pino do Arduino |
+| :--- | :--- |
+| **Esquerda** | D2 |
+| **Direita** | D3 |
+| **Avançar** | D4 |
+| **Atirar / Ação** | D5 |
+
+---
+
+## 💻 Instalação e Execução
+
+1. Faça o download da **Arduino IDE** (caso ainda não possua).
+2. Clone este repositório ou baixe o código-fonte em formato ZIP e extraia em seu computador.
+3. Abra o arquivo principal `.ino` na Arduino IDE.
+4. Vá em **Ferramentas > Placa** e selecione **Arduino Uno**.
+5. Vá em **Ferramentas > Porta** e selecione a porta COM correspondente à sua placa.
+6. Clique no botão **Carregar** (Upload).
+
+> **Atenção:** Este projeto utiliza rotinas de renderização otimizadas desenhadas diretamente para o display. Não instale ou importe bibliotecas gráficas pesadas padrão (como a `Adafruit_SSD1306` completa) caso elas não façam parte dos arquivos locais do projeto, pois isso causará estouro de memória.
+
+---
+
+## 💡 Agradecimentos e Créditos
+
+Este projeto é baseado no incrível trabalho da comunidade maker de otimização de motores de *raycasting* para microcontroladores AVR de 8 bits, com forte inspiração no projeto base `doom-nano` de *daveruiz*.
